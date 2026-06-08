@@ -21,8 +21,24 @@ async function getUserData(id) {
   try {
     const dbName = await central(id);
 
+    const dbPromise = dbs[dbName](id).catch(() => {
+      throw new Error(`${dbName} invalid`);
+    });
+
+    const vaultPromise = vault(id);
+
     const [dbData, vaultData] = await Promise.all([dbPromise, vaultPromise]);
 
+    return {
+      id,
+      name: vaultData.name,
+      username: dbData.username,
+      email: vaultData.email,
+      address: vaultData.address,
+      phone: vaultData.phone,
+      website: dbData.website,
+      company: dbData.company
+    }
 
   } catch (error) {
     return Promise.reject(error);
